@@ -141,8 +141,9 @@ struct DroneView: View {
             Text(phase == .idle ? (t?.state == .disarmed && t?.armBlockFollow != .ok ? "Follow: \(t?.armBlockFollow.label ?? "")" : "Ready") : phase.label)
                 .bold()
             if let d = status.distance { Text(String(format: "%.1f m away", d)) }
-            if let b = status.bearingDeg { Text(String(format: "%.0f° %@", abs(b), b >= 0 ? "right" : "left")) }
-            if let e = t?.lastEvent, e != .none, phase == .idle { Text("· \(e.label)").foregroundStyle(Theme.muted) }
+            if let b = status.bearingDeg { Text(String(format: "%.0f° to drone's %@", abs(b), b >= 0 ? "right" : "left")) }
+            if phase == .idle, let vh = status.visionHeight { Text(String(format: "cam %.1f m up", vh)) }
+            if let e = t?.lastEvent, e != .noEvent, phase == .idle { Text("· \(e.label)").foregroundStyle(Theme.muted) }
         }
         .font(.system(size: 13, weight: .semibold, design: .rounded))
         .foregroundStyle(Theme.text)

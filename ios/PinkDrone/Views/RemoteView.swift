@@ -46,7 +46,7 @@ struct RemoteView: View {
                         Text("Arm: \(t.armBlockManual.label)")
                             .font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.warn)
                     } else if let t {
-                        Text(t.state == .manual ? "Manual · thr \(Int(t.throttle * 100))%" : (t.lastEvent == .none ? t.state.label : "\(t.state.label) · \(t.lastEvent.label)"))
+                        Text(t.state == .manual ? "Manual · thr \(Int(t.throttle * 100))%" : (t.lastEvent == .noEvent ? t.state.label : "\(t.state.label) · \(t.lastEvent.label)"))
                             .font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.softPink)
                     }
 

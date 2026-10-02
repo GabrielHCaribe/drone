@@ -52,8 +52,10 @@ struct CameraGeometry {
 
     private var axes: (right: SIMD3<Double>, down: SIMD3<Double>, forward: SIMD3<Double>) {
         let gv = g
-        let down: SIMD3<Double> = abs(gv.x) > abs(gv.y) ? SIMD3(gv.x > 0 ? 1 : -1, 0, 0) : SIMD3(0, gv.y > 0 ? 1 : -1, 0)
-        let forward: SIMD3<Double> = front ? SIMD3(0, 0, 1) : SIMD3(0, 0, -1)
+        let down: SIMD3<Double> = abs(gv.x) > abs(gv.y)
+            ? SIMD3<Double>(gv.x > 0 ? 1.0 : -1.0, 0.0, 0.0)
+            : SIMD3<Double>(0.0, gv.y > 0 ? 1.0 : -1.0, 0.0)
+        let forward = SIMD3<Double>(0.0, 0.0, front ? 1.0 : -1.0)
         let right = simd_cross(down, forward)
         return (right, down, forward)
     }

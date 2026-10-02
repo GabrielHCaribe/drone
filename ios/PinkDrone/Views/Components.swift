@@ -63,13 +63,13 @@ struct HoldButton: View {
                 .overlay(Capsule().stroke(.white.opacity(0.3), lineWidth: 1))
             )
             .shadow(color: Theme.pink.opacity(0.4), radius: 8)
-            .onLongPressGesture(minimumDuration: seconds, pressing: { pressing in
-                holding = pressing
-                withAnimation(pressing ? .linear(duration: seconds) : .easeOut(duration: 0.2)) { progress = pressing ? 1 : 0 }
-            }, perform: {
+            .onLongPressGesture(minimumDuration: seconds, perform: {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 action()
                 withAnimation { progress = 0 }
+            }, onPressingChanged: { pressing in
+                holding = pressing
+                withAnimation(pressing ? .linear(duration: seconds) : .easeOut(duration: 0.2)) { progress = pressing ? 1 : 0 }
             })
     }
 }

@@ -96,12 +96,12 @@ enum ResultCode: UInt8 {
 }
 
 enum LandReason: UInt8 {
-    case none = 0, command, laptopLost, pilotLost, dronePhoneLost, battery, followTimeout, targetLost
+    case noEvent = 0, command, laptopLost, pilotLost, dronePhoneLost, battery, followTimeout, targetLost
     case crash, killed, autoDisarm, touchdown, disarmCommand, imuFault
 
     var label: String {
         switch self {
-        case .none: return "-"
+        case .noEvent: return "-"
         case .command: return "Land command"
         case .laptopLost: return "Laptop link lost"
         case .pilotLost: return "Remote link lost"
@@ -288,7 +288,7 @@ struct Telemetry {
         let ab = r.u8()
         armBlockManual = ResultCode(rawValue: ab & 0x0F) ?? .unknown
         armBlockFollow = ResultCode(rawValue: ab >> 4) ?? .unknown
-        lastEvent = LandReason(rawValue: r.u8()) ?? .none
+        lastEvent = LandReason(rawValue: r.u8()) ?? .noEvent
         roll = Double(r.i16()) / 100
         pitch = Double(r.i16()) / 100
         yaw = Double(r.i16()) / 100

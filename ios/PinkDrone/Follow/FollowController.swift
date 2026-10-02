@@ -26,6 +26,7 @@ final class FollowStatus: ObservableObject {
     @Published var distance: Double?
     @Published var bearingDeg: Double?
     @Published var lateral: Double?
+    @Published var visionHeight: Double?   // camera height measured from your feet/head (hand-held check)
     @Published var height = 0.0
     @Published var heightSigma = 0.0
     @Published var sensorsReady = false
@@ -81,6 +82,7 @@ final class FollowController {
     private var latRate = 0.0
     private var lastMeasTime: TimeInterval = 0
     private var bearing = 0.0
+    private var visionHeight: Double?
     private var personHeight: Double
 
     // output
@@ -212,6 +214,7 @@ final class FollowController {
         let m = PersonGeometry.measure(box: box, geometry: geo, personHeight: personHeight,
                                        heightEstimate: airborne ? kf.height + cameraHeightOffset : nil)
         bearing = FollowConfig.invertLateral ? -m.bearing : m.bearing
+        visionHeight = m.cameraHeight
 
         if let ch = m.cameraHeight, let d = m.distance {
             if airborne {
@@ -385,6 +388,7 @@ final class FollowController {
         let d = visible ? distFilt : nil
         let b = visible ? bearing * 180 / .pi : nil
         let lat = visible ? latFilt : nil
+        let vh = visible ? visionHeight : nil
         let box = targetBox, others = otherBoxes
         DispatchQueue.main.async {
             let s = self.status
@@ -393,6 +397,7 @@ final class FollowController {
             s.distance = d
             s.bearingDeg = b
             s.lateral = lat
+            s.visionHeight = vh
             s.height = h
             s.heightSigma = hs
             s.sensorsReady = sensorsReady
