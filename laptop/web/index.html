@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PinkDrone Ground Station</title>
+<style>
+  :root {
+    --bg: #1d0f1a;
+    --panel: #2a1526;
+    --panel2: #34192f;
+    --pink: #ff6fb5;
+    --pink-soft: #ffb3d9;
+    --lilac: #c9a2ff;
+    --text: #ffe9f5;
+    --muted: #c99bb8;
+    --ok: #7dffc4;
+    --warn: #ffd36f;
+    --bad: #ff3b6b;
+    --radius: 22px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: radial-gradient(1200px 700px at 20% -10%, #3c1636 0%, var(--bg) 60%); color: var(--text);
+    font: 15px/1.35 "Segoe UI", system-ui, -apple-system, sans-serif; }
+  body { display: grid; grid-template-rows: auto 1fr auto; gap: 14px; padding: 14px; min-height: 100vh; }
+  .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .pill { background: var(--panel); border: 1px solid #ffffff14; border-radius: 999px; padding: 8px 16px; display: flex; gap: 8px; align-items: center;
+    box-shadow: 0 0 18px #ff6fb522 inset; }
+  .pill b { color: var(--pink-soft); font-weight: 600; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); box-shadow: 0 0 10px currentColor; }
+  .ok { color: var(--ok); } .warn { color: var(--warn); } .bad { color: var(--bad); }
+  .dot.ok { background: var(--ok); } .dot.warn { background: var(--warn); } .dot.bad { background: var(--bad); }
+  h1 { font-size: 20px; margin: 0 12px 0 4px; background: linear-gradient(90deg, var(--pink), var(--lilac)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 14px; min-height: 0; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  .card { background: linear-gradient(160deg, var(--panel2), var(--panel)); border-radius: var(--radius); padding: 14px; border: 1px solid #ffffff10;
+    box-shadow: 0 10px 40px #0006, 0 0 30px #ff6fb512 inset; }
+  .video { position: relative; display: flex; align-items: center; justify-content: center; min-height: 360px; overflow: hidden; }
+  .video img, .video canvas { position: absolute; max-width: 100%; max-height: 100%; }
+  .video .placeholder { color: var(--muted); text-align: center; }
+  .controls { display: flex; flex-direction: column; gap: 12px; }
+  button { font: inherit; color: var(--text); border: 0; border-radius: 18px; padding: 14px 16px; cursor: pointer;
+    background: linear-gradient(180deg, #ff8cc6, #e2559d); box-shadow: 0 6px 20px #ff6fb544, 0 0 0 1px #ffffff22 inset; font-weight: 600; letter-spacing: .3px; }
+  button:active { transform: translateY(1px) scale(.99); }
+  button.secondary { background: linear-gradient(180deg, #5b2a52, #45203f); box-shadow: 0 0 0 1px #ffffff1a inset; }
+  button.confirm { background: linear-gradient(180deg, #ffe08a, #ffb84d); color: #3a1a00; }
+  #kill { font-size: 34px; padding: 34px 10px; border-radius: 28px; letter-spacing: 3px;
+    background: radial-gradient(circle at 50% 30%, #ff6b8e, #d40f45 70%); box-shadow: 0 0 0 4px #ffffff30 inset, 0 0 40px #ff1f5a88, 0 12px 30px #0008; }
+  #kill small { display: block; font-size: 13px; letter-spacing: 1px; opacity: .85; margin-top: 6px; }
+  #kill.latched { animation: pulse .6s infinite alternate; }
+  @keyframes pulse { from { box-shadow: 0 0 20px #ff1f5a; } to { box-shadow: 0 0 70px #ff1f5a; } }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  td, th { padding: 4px 6px; text-align: right; } th { color: var(--muted); font-weight: 500; } td:first-child, th:first-child { text-align: left; }
+  .big { font-size: 26px; font-weight: 700; }
+  .muted { color: var(--muted); }
+  #countdown { position: absolute; font-size: 160px; font-weight: 800; color: #fff; text-shadow: 0 0 40px var(--pink); display: none; }
+  #banner { padding: 10px 16px; border-radius: 16px; display: none; font-weight: 600; }
+  #banner.show { display: block; }
+  footer { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .switch { display: flex; align-items: center; justify-content: space-between; }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <h1>&#9829; PinkDrone</h1>
+    <div class="pill"><span class="dot" id="linkDot"></span><span id="linkText">no drone</span></div>
+    <div class="pill">State <b id="state">-</b></div>
+    <div class="pill" id="armedPill"><b id="armed">DISARMED</b></div>
+    <div class="pill">Battery <b id="vbat">-</b></div>
+    <div class="pill">Height <b id="height">-</b></div>
+    <div class="pill">Follow left <b id="followLeft">-</b></div>
+    <div class="pill"><span class="dot" id="hbDot"></span><span id="hbText">kill switch</span></div>
+  </div>
+
+  <main>
+    <div class="card video" id="videoBox">
+      <div class="placeholder" id="videoPlaceholder">Video is off.<br><span class="muted">Turn it on below once the bench test shows no effect on the control link.</span></div>
+      <img id="videoImg" alt="" style="display:none">
+      <canvas id="overlay"></canvas>
+      <div id="countdown"></div>
+    </div>
+
+    <div class="controls">
+      <div id="banner"></div>
+      <button id="kill">KILL<small>Space / K &middot; motors off now</small></button>
+      <div class="row">
+        <button id="land">LAND</button>
+        <button id="disarm" class="secondary">DISARM</button>
+      </div>
+      <button id="follow">START FOLLOW</button>
+      <button id="clearKill" class="secondary" style="display:none">Clear kill (disarms)</button>
+      <div class="card">
+        <div class="switch"><span>Video from drone phone</span><button id="videoToggle" class="secondary">Turn on</button></div>
+        <div class="muted" id="videoStats" style="margin-top:6px">-</div>
+      </div>
+      <div class="card">
+        <div class="muted">Last result</div>
+        <div id="acks">-</div>
+        <div class="muted" style="margin-top:8px">Arming / follow check</div>
+        <div id="armBlock">-</div>
+        <div class="muted" style="margin-top:8px">Last event</div>
+        <div id="lastEvent">-</div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="card">
+      <table>
+        <tr><th>Link</th><th>pkts/s</th><th>loss</th><th>age</th></tr>
+        <tr><td>Laptop</td><td id="r0">-</td><td id="l0">-</td><td id="a0">-</td></tr>
+        <tr><td>Phone (remote)</td><td id="r1">-</td><td id="l1">-</td><td id="a1">-</td></tr>
+        <tr><td>Phone (drone)</td><td id="r2">-</td><td id="l2">-</td><td id="a2">-</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <table>
+        <tr><th>Control loop</th><th></th></tr>
+        <tr><td>Rate</td><td id="loopHz">-</td></tr>
+        <tr><td>Worst execution</td><td id="loopMax">-</td></tr>
+        <tr><td>Worst jitter</td><td id="loopJit">-</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <table>
+        <tr><th>Attitude / motors</th><th></th></tr>
+        <tr><td>Roll / Pitch / Yaw</td><td id="att">-</td></tr>
+        <tr><td>Throttle / hover</td><td id="thr">-</td></tr>
+        <tr><td>M1 M2 M3 M4 (%)</td><td id="motors">-</td></tr>
+      </table>
+    </div>
+  </footer>
+
+<script>
+const STATES = ["BOOT (calibrating)", "DISARMED", "MOTOR TEST", "ESC CAL", "FOLLOW COUNTDOWN", "MANUAL", "FOLLOW",
+                "FAILSAFE HOVER", "LANDING", "KILLED", "IMU FAULT"];
+const RESULTS = ["OK", "wrong state", "laptop not connected", "no pilot (remote phone)", "throttle not low", "not level",
+                 "IMU not ready", "battery low", "kill latched", "drone phone not connected", "drone phone not ready",
+                 "already armed", "bad parameter", "not allowed from here", "unknown"];
+const EVENTS = ["-", "land command", "laptop link lost", "pilot link lost", "drone phone link lost", "low battery",
+                "follow time limit", "target lost", "crash detected", "KILLED", "auto-disarm", "touchdown",
+                "disarm command", "IMU fault"];
+const $ = (id) => document.getElementById(id);
+
+// ---- heartbeat from a Web Worker: keeps running when this tab is in the background
+const hbWorker = new Worker(URL.createObjectURL(new Blob([
+  `setInterval(() => fetch("${location.origin}/hb", {method: "POST"}).catch(() => {}), 100);`
+], {type: "text/javascript"})));
+
+async function cmd(name, arg = 0) {
+  try { await fetch("/cmd", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({cmd: name, arg})}); }
+  catch (e) { banner("Ground station not responding!", "bad"); }
+}
+
+function kill() { cmd("kill"); $("kill").classList.add("latched"); }
+$("kill").addEventListener("pointerdown", (e) => { e.preventDefault(); kill(); });
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Space" || e.key === "k" || e.key === "K") { e.preventDefault(); kill(); }
+});
+$("land").onclick = () => cmd("land");
+$("disarm").onclick = () => cmd("disarm");
+$("clearKill").onclick = () => { cmd("clear_kill"); $("kill").classList.remove("latched"); };
+
+// Two-step START FOLLOW: first click arms the button for 3 s, second click sends it.
+let followArmedUntil = 0;
+$("follow").onclick = () => {
+  const now = Date.now();
+  if (now < followArmedUntil) { followArmedUntil = 0; cmd("start_follow"); renderFollowBtn(); return; }
+  followArmedUntil = now + 3000; renderFollowBtn(); setTimeout(renderFollowBtn, 3100);
+};
+function renderFollowBtn() {
+  const armed = Date.now() < followArmedUntil;
+  $("follow").textContent = armed ? "CONFIRM: start follow?" : "START FOLLOW";
+  $("follow").className = armed ? "confirm" : "";
+}
+
+let videoOn = false;
+$("videoToggle").onclick = () => cmd(videoOn ? "video_off" : "video_on");
+
+function banner(text, cls) {
+  const b = $("banner");
+  if (!text) { b.className = ""; return; }
+  b.textContent = text; b.className = "show " + cls;
+  b.style.background = cls === "bad" ? "#ff3b6b33" : "#ffd36f22";
+}
+
+// ---- video overlay (tracking box)
+function drawOverlay(box, tracking) {
+  const img = $("videoImg"), c = $("overlay");
+  if (!img.naturalWidth || img.style.display === "none") { c.width = 0; return; }
+  const r = img.getBoundingClientRect(), pr = $("videoBox").getBoundingClientRect();
+  c.style.left = (r.left - pr.left) + "px"; c.style.top = (r.top - pr.top) + "px";
+  c.width = r.width; c.height = r.height;
+  const g = c.getContext("2d");
+  g.clearRect(0, 0, c.width, c.height);
+  if (!box) return;
+  g.lineWidth = 4; g.strokeStyle = tracking ? "#ff6fb5" : "#c9a2ff"; g.shadowColor = "#ff6fb5"; g.shadowBlur = 16;
+  const [x, y, w, h] = box;
+  g.beginPath(); g.roundRect ? g.roundRect(x * c.width, y * c.height, w * c.width, h * c.height, 16)
+                             : g.rect(x * c.width, y * c.height, w * c.width, h * c.height);
+  g.stroke();
+}
+
+// ---- telemetry polling (10 Hz)
+async function poll() {
+  let s;
+  try { s = await (await fetch("/state")).json(); }
+  catch (e) { banner("Ground station program is not running!", "bad"); return; }
+  const t = s.telem, fresh = t && s.telem_age !== null && s.telem_age < 0.5;
+
+  $("hbDot").className = "dot " + (s.browser_alive ? "ok" : "bad");
+  $("hbText").textContent = s.browser_alive ? "kill switch active" : "heartbeat stopped!";
+  $("linkDot").className = "dot " + (fresh ? "ok" : (t ? "warn" : "bad"));
+  $("linkText").textContent = fresh ? "drone connected" : (t ? "drone link lost" : "no drone (join PinkDrone WiFi)");
+  $("clearKill").style.display = s.kill_latched || (t && t.state === 9) ? "block" : "none";
+  if (!s.kill_latched) $("kill").classList.remove("latched");
+
+  if (!t) return;
+  banner(s.kill_latched ? "KILL LATCHED - motors are off. Press 'Clear kill' to reset." : (!fresh ? "No telemetry from the drone." : ""), "bad");
+
+  $("state").textContent = STATES[t.state] || t.state;
+  const armed = (t.sflags & 1) !== 0;
+  $("armed").textContent = armed ? "ARMED" : "DISARMED";
+  $("armed").className = armed ? "bad" : "ok";
+  const battPresent = (t.sflags & 0x20) !== 0, battWarn = (t.sflags & 0x10) !== 0;
+  $("vbat").textContent = battPresent ? t.vbat.toFixed(2) + " V" : "USB / none";
+  $("vbat").className = battWarn ? "bad" : "";
+  $("height").textContent = (t.state === 6 || t.state === 8 || t.state === 7) ? t.height.toFixed(2) + " m" : "-";
+  $("followLeft").textContent = t.state === 6 ? t.follow_left.toFixed(0) + " s" : "-";
+  $("countdown").style.display = t.state === 4 ? "block" : "none";
+  $("countdown").textContent = Math.ceil(t.countdown);
+
+  const names = ["Laptop", "Remote", "Drone"];
+  for (let i = 0; i < 3; i++) {
+    $("r" + i).textContent = t.link_rate[i];
+    $("l" + i).textContent = t.link_loss[i] + " %";
+    $("l" + i).className = t.link_loss[i] > 5 ? "bad" : (t.link_loss[i] > 1 ? "warn" : "");
+    $("a" + i).textContent = t.link_age[i] >= 65535 ? "never" : t.link_age[i] + " ms";
+  }
+  $("loopHz").textContent = t.loop_hz + " Hz";
+  $("loopMax").textContent = t.loop_max_us + " us";
+  $("loopJit").textContent = t.loop_jitter_us + " us";
+  $("loopJit").className = t.loop_jitter_us > 200 ? "warn" : "";
+  $("att").textContent = `${t.roll.toFixed(1)}° / ${t.pitch.toFixed(1)}° / ${t.yaw.toFixed(0)}°`;
+  $("thr").textContent = `${t.throttle.toFixed(0)} % / ${t.hover.toFixed(0)} %`;
+  $("motors").textContent = t.motors.map(m => m.toFixed(0)).join("  ");
+  $("armBlock").textContent = `manual: ${RESULTS[t.arm_block_manual]}  ·  follow: ${RESULTS[t.arm_block_follow]}`;
+  $("lastEvent").textContent = EVENTS[t.last_event] || t.last_event;
+  const ack = s.acks[s.acks.length - 1];
+  $("acks").textContent = ack ? `${ack.cmd}: ${RESULTS[ack.result] || ack.result}` : "-";
+
+  videoOn = (t.sflags & 0x40) !== 0;
+  $("videoToggle").textContent = videoOn ? "Turn off" : "Turn on";
+  const vfresh = s.video.age !== null && s.video.age < 1.0;
+  $("videoStats").textContent = videoOn ? (vfresh ? `${s.video.fps} fps` : "waiting for frames...") : "off";
+  const img = $("videoImg");
+  if (videoOn && img.style.display === "none") { img.src = "/video.mjpg?" + Date.now(); img.style.display = "block"; $("videoPlaceholder").style.display = "none"; }
+  if (!videoOn && img.style.display !== "none") { img.src = ""; img.style.display = "none"; $("videoPlaceholder").style.display = "block"; }
+  drawOverlay(vfresh ? s.video.box : null, s.video.tracking);
+}
+setInterval(poll, 100);
+poll();
+</script>
+</body>
+</html>

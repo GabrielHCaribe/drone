@@ -1,0 +1,13 @@
+# Secrets (never commit)
+firmware/DroneFC/secrets.h
+ios/Secrets.xcconfig
+*.p8
+
+# Generated / build output
+ios/*.xcodeproj/
+ios/build/
+build/
+DerivedData/
+__pycache__/
+*.pyc
+.DS_Store

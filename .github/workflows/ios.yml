@@ -1,0 +1,117 @@
+# Builds the iPhone app on a GitHub-hosted Mac (no Mac needed on your side).
+#
+#  * Every push that touches ios/: compile check (no signing, no secrets needed).
+#  * Push to main, or "Run workflow" with "Upload to TestFlight" ticked:
+#    signed archive + upload to TestFlight. Needs the 5 repository secrets
+#    described in docs/IOS_BUILD.md.
+name: iOS app
+
+on:
+  push:
+    paths: ["ios/**", ".github/workflows/ios.yml"]
+  workflow_dispatch:
+    inputs:
+      testflight:
+        description: "Upload to TestFlight"
+        type: boolean
+        default: true
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      DRONE_WIFI_PASSWORD: ${{ secrets.DRONE_WIFI_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Xcode version
+        run: xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Write Secrets.xcconfig
+        run: |
+          printf 'DRONE_WIFI_SSID = PinkDrone\nDRONE_WIFI_PASSWORD = %s\nDEVELOPMENT_TEAM = %s\n' \
+            "${DRONE_WIFI_PASSWORD:-}" "${APPLE_TEAM_ID:-}" > ios/Secrets.xcconfig
+          if [ -z "${DRONE_WIFI_PASSWORD:-}" ]; then
+            echo "::warning::DRONE_WIFI_PASSWORD secret not set - the app will ask you to join the WiFi manually"
+          fi
+
+      - name: Generate Xcode project
+        working-directory: ios
+        run: xcodegen generate
+
+      - name: Compile (unsigned)
+        working-directory: ios
+        run: |
+          xcodebuild -project PinkDrone.xcodeproj -scheme PinkDrone -configuration Release \
+            -destination 'generic/platform=iOS' -derivedDataPath build/dd \
+            CODE_SIGNING_ALLOWED=NO -quiet build
+
+      - name: Decide on TestFlight upload
+        id: tf
+        run: |
+          want=false
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.testflight }}" = "true" ]; then want=true; fi
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref }}" = "refs/heads/main" ]; then want=true; fi
+          if [ "$want" = "true" ]; then
+            if [ -z "${ASC_KEY_ID:-}" ] || [ -z "${ASC_ISSUER_ID:-}" ] || [ -z "${ASC_KEY_P8:-}" ] || [ -z "${APPLE_TEAM_ID:-}" ]; then
+              echo "::warning::TestFlight upload skipped: App Store Connect secrets are missing (see docs/IOS_BUILD.md)"
+              want=false
+            fi
+          fi
+          echo "upload=$want" >> "$GITHUB_OUTPUT"
+
+      - name: Archive (signed with the App Store Connect API key)
+        if: steps.tf.outputs.upload == 'true'
+        working-directory: ios
+        run: |
+          mkdir -p "$HOME/private_keys"
+          KEY="$HOME/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          printf '%s\n' "$ASC_KEY_P8" > "$KEY"
+          xcodebuild -project PinkDrone.xcodeproj -scheme PinkDrone -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath build/PinkDrone.xcarchive \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$KEY" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" CODE_SIGN_STYLE=Automatic \
+            CURRENT_PROJECT_VERSION=${{ github.run_number }} \
+            -quiet archive
+
+      - name: Upload to TestFlight
+        if: steps.tf.outputs.upload == 'true'
+        working-directory: ios
+        run: |
+          KEY="$HOME/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          cat > build/ExportOptions.plist <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>${APPLE_TEAM_ID}</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+            <key>uploadSymbols</key><true/>
+          </dict>
+          </plist>
+          PLIST
+          xcodebuild -exportArchive -archivePath build/PinkDrone.xcarchive \
+            -exportOptionsPlist build/ExportOptions.plist -exportPath build/export \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$KEY" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+          echo "Uploaded build ${{ github.run_number }}. It appears in TestFlight after Apple finishes processing (5-30 min)."
+
+      - name: Remove API key
+        if: always()
+        run: rm -rf "$HOME/private_keys"
