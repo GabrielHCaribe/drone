@@ -37,7 +37,7 @@
    [boot] keep the drone still: calibrating gyro (LED blinks fast)
    ```
    - `0x71`, `0x73`, `0x74` or `0x75` are also fine (relabelled chips).
-   - `NOT FOUND` means you should check the IMU wiring. The motors stay disabled.
+   - `NOT FOUND` means you should check the IMU wiring. The board then starts in **bench mode**: the app connects and motor test / ESC calibration work (props off), but arming is refused. The LED shows the normal "disarmed" flash.
 
 ## LED
 

@@ -35,11 +35,14 @@ void setup() {
 
   bool imu_ok = imu_init();
   Serial.printf("[boot] MPU WHO_AM_I = 0x%02X -> %s\n", imu_whoami(), imu_ok ? "OK" : "NOT FOUND / BAD CONFIG");
-  if (!imu_ok) Serial.println("[boot] Check the IMU wiring (docs/WIRING.md). Motors stay disabled.");
+  if (!imu_ok) {
+    Serial.println("[boot] Check the IMU wiring (docs/WIRING.md).");
+    Serial.println("[boot] BENCH MODE: app, motor test and ESC calibration work; arming is refused.");
+  }
 
   link_start();
   flight_start(imu_ok);
-  Serial.println("[boot] keep the drone still: calibrating gyro (LED blinks fast)");
+  if (imu_ok) Serial.println("[boot] keep the drone still: calibrating gyro (LED blinks fast)");
 }
 
 void loop() {

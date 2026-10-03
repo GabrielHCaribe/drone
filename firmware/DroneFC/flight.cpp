@@ -260,6 +260,7 @@ void handle_command(const CmdMsg& m, int64_t now) {
       break;
 
     case CMD_CAL_GYRO:
+      if (!imu_ok) { ack(m, RES_IMU_NOT_READY); break; }
       if (state != ST_DISARMED) { ack(m, RES_WRONG_STATE); break; }
       cal_n = 0;
       gyro_cal_ok = false;
@@ -679,9 +680,14 @@ void control_task(void*) {
   imu_ok = s_imu_ok_at_boot;
   params_snapshot(P);
   param_ver = params_version();
-  if (!imu_ok) {
+  // Bench mode: no IMU at boot. Run the loop on a fake level, still reading so the
+  // app, motor test and ESC calibration work. imu_ok stays false, so arming is refused.
+  const bool bench = !imu_ok;
+  const ImuSample level = {0, 0, 0, 0, 0, 1.0f};
+  if (bench) {
     last_event = LR_IMU_FAULT;
-    enter(ST_IMU_FAULT, esp_timer_get_time());
+    ahrs.reset_from_accel(level);
+    enter(ST_DISARMED, esp_timer_get_time());
   } else {
     enter(ST_BOOT, esp_timer_get_time());
   }
@@ -689,12 +695,20 @@ void control_task(void*) {
   stats_window_us = last_loop_us;
 
   for (;;) {
-    // Wait for the IMU data-ready interrupt (1 kHz). 3 ms timeout = missed interrupt.
-    uint32_t got = ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(3));
-    int64_t start = esp_timer_get_time();
-
     ImuSample raw;
-    bool ok = imu_ok && imu_read(raw);
+    uint32_t got;
+    bool ok;
+    if (bench) {
+      vTaskDelay(1);
+      got = 1;
+      raw = level;
+      ok = true;
+    } else {
+      // Wait for the IMU data-ready interrupt (1 kHz). 3 ms timeout = missed interrupt.
+      got = ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(3));
+      ok = imu_ok && imu_read(raw);
+    }
+    int64_t start = esp_timer_get_time();
     if (!ok || got == 0) {
       if (++imu_fail_count > 20 && state != ST_IMU_FAULT) {
         // No attitude = no safe way to fly. Motors off.
