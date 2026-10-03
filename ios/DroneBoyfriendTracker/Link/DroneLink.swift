@@ -23,7 +23,7 @@ final class DroneLink: ObservableObject {
     var telemetryObserver: ((Telemetry) -> Void)?
 
     private(set) var source: Source = .remote
-    private let queue = DispatchQueue(label: "pinkdrone.link", qos: .userInteractive)
+    private let queue = DispatchQueue(label: "droneboyfriendtracker.link", qos: .userInteractive)
     private var connection: NWConnection?
     private var timer: DispatchSourceTimer?
     private var seq: UInt16 = 0

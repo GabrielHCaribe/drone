@@ -41,7 +41,7 @@ jobs:
 
       - name: Write Secrets.xcconfig
         run: |
-          printf 'DRONE_WIFI_SSID = PinkDrone\nDRONE_WIFI_PASSWORD = %s\nDEVELOPMENT_TEAM = %s\n' \
+          printf 'DRONE_WIFI_SSID = DroneBoyfriendTracker\nDRONE_WIFI_PASSWORD = %s\nDEVELOPMENT_TEAM = %s\n' \
             "${DRONE_WIFI_PASSWORD:-}" "${APPLE_TEAM_ID:-}" > ios/Secrets.xcconfig
           if [ -z "${DRONE_WIFI_PASSWORD:-}" ]; then
             echo "::warning::DRONE_WIFI_PASSWORD secret not set - the app will ask you to join the WiFi manually"
@@ -54,7 +54,7 @@ jobs:
       - name: Compile (unsigned)
         working-directory: ios
         run: |
-          xcodebuild -project PinkDrone.xcodeproj -scheme PinkDrone -configuration Release \
+          xcodebuild -project DroneBoyfriendTracker.xcodeproj -scheme DroneBoyfriendTracker -configuration Release \
             -destination 'generic/platform=iOS' -derivedDataPath build/dd \
             CODE_SIGNING_ALLOWED=NO -quiet build
 
@@ -79,8 +79,8 @@ jobs:
           mkdir -p "$HOME/private_keys"
           KEY="$HOME/private_keys/AuthKey_${ASC_KEY_ID}.p8"
           printf '%s\n' "$ASC_KEY_P8" > "$KEY"
-          xcodebuild -project PinkDrone.xcodeproj -scheme PinkDrone -configuration Release \
-            -destination 'generic/platform=iOS' -archivePath build/PinkDrone.xcarchive \
+          xcodebuild -project DroneBoyfriendTracker.xcodeproj -scheme DroneBoyfriendTracker -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath build/DroneBoyfriendTracker.xcarchive \
             -allowProvisioningUpdates \
             -authenticationKeyPath "$KEY" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
             DEVELOPMENT_TEAM="$APPLE_TEAM_ID" CODE_SIGN_STYLE=Automatic \
@@ -106,7 +106,7 @@ jobs:
           </dict>
           </plist>
           PLIST
-          xcodebuild -exportArchive -archivePath build/PinkDrone.xcarchive \
+          xcodebuild -exportArchive -archivePath build/DroneBoyfriendTracker.xcarchive \
             -exportOptionsPlist build/ExportOptions.plist -exportPath build/export \
             -allowProvisioningUpdates \
             -authenticationKeyPath "$KEY" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID"

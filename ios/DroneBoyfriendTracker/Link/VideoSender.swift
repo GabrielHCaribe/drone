@@ -13,7 +13,7 @@ import ImageIO
 import CoreVideo
 
 final class VideoSender {
-    private let queue = DispatchQueue(label: "pinkdrone.video", qos: .utility)
+    private let queue = DispatchQueue(label: "droneboyfriendtracker.video", qos: .utility)
     private let ciContext = CIContext(options: [.cacheIntermediates: false])
     private let colorSpace = CGColorSpaceCreateDeviceRGB()
     private let lock = NSLock()

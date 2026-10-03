@@ -1,6 +1,6 @@
 # XcodeGen project definition. The .xcodeproj is generated from this file
 # (in CI, or with `xcodegen` on a Mac) and is not committed.
-name: PinkDrone
+name: DroneBoyfriendTracker
 options:
   bundleIdPrefix: com.gabrielhcaribe
   deploymentTarget:
@@ -12,20 +12,20 @@ settings:
     MARKETING_VERSION: "1.0"
     CURRENT_PROJECT_VERSION: "1"
 targets:
-  PinkDrone:
+  DroneBoyfriendTracker:
     type: application
     platform: iOS
     sources:
-      - path: PinkDrone
+      - path: DroneBoyfriendTracker
     configFiles:
       Debug: Secrets.xcconfig
       Release: Secrets.xcconfig
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.gabrielhcaribe.pinkdrone
-        PRODUCT_NAME: PinkDrone
+        PRODUCT_BUNDLE_IDENTIFIER: com.gabrielhcaribe.droneboyfriendtracker
+        PRODUCT_NAME: DroneBoyfriendTracker
         INFOPLIST_FILE: Support/Info.plist
-        CODE_SIGN_ENTITLEMENTS: Support/PinkDrone.entitlements
+        CODE_SIGN_ENTITLEMENTS: Support/DroneBoyfriendTracker.entitlements
         CODE_SIGN_STYLE: Automatic
         TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon

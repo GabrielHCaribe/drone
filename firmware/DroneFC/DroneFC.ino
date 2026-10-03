@@ -1,5 +1,5 @@
 // =============================================================================
-//  PinkDrone flight controller  -  ESP32-WROOM-32 (38-pin DevKitC)
+//  DroneBoyfriendTracker flight controller  -  ESP32-WROOM-32 (38-pin DevKitC)
 //
 //  Arduino IDE: Tools > Board > "ESP32 Dev Module". Full instructions are in
 //  docs/ESP32_UPLOAD.md.
@@ -28,7 +28,7 @@ void setup() {
   Serial.begin(115200);
   delay(200);
   Serial.println();
-  Serial.println("[boot] PinkDrone FC");
+  Serial.println("[boot] DroneBoyfriendTracker FC");
 
   params_init();
   shared_init();

@@ -1,6 +1,6 @@
 # Building the iPhone app without a Mac (GitHub Actions + TestFlight)
 
-[Certain] Xcode only runs on macOS. Here, GitHub's cloud Macs build the app and Apple's TestFlight installs it on your iPhone. You do a one-time setup in the browser on Windows. The `ios/PinkDrone.xcodeproj` is generated from `ios/project.yml` during the build, so you never open Xcode.
+[Certain] Xcode only runs on macOS. Here, GitHub's cloud Macs build the app and Apple's TestFlight installs it on your iPhone. You do a one-time setup in the browser on Windows. The `ios/DroneBoyfriendTracker.xcodeproj` is generated from `ios/project.yml` during the build, so you never open Xcode.
 
 [Likely] Because the repo is public, the cloud Mac builds cost nothing.
 
@@ -9,15 +9,15 @@
 ### 1. Register the app ID (developer.apple.com)
 1. **Certificates, IDs & Profiles → Identifiers → +**.
 2. Choose **App IDs → App**.
-3. Description `PinkDrone`. Bundle ID: **Explicit** `com.gabrielhcaribe.pinkdrone`.
+3. Description `DroneBoyfriendTracker`. Bundle ID: **Explicit** `com.gabrielhcaribe.droneboyfriendtracker`.
 4. Under Capabilities, tick **Hotspot**. This is what lets the app join the drone WiFi automatically.
 5. Click **Continue → Register**.
 
 ### 2. Create the app record (appstoreconnect.apple.com)
 1. **Apps → + → New App**.
 2. Platform **iOS**.
-3. Name: anything unique on the App Store, e.g. `PinkDrone GHC`. The name on your home screen stays "PinkDrone".
-4. Language English, Bundle ID `com.gabrielhcaribe.pinkdrone`, SKU `pinkdrone`.
+3. Name: anything unique on the App Store, e.g. `DroneBoyfriendTracker GHC`. The name on your home screen stays "DroneBoyfriendTracker".
+4. Language English, Bundle ID `com.gabrielhcaribe.droneboyfriendtracker`, SKU `droneboyfriendtracker`.
 5. Click **Create**. You don't need to fill in anything else, because TestFlight internal testing has no review.
 
 ### 3. Create an App Store Connect API key
@@ -54,7 +54,7 @@ Secrets are encrypted and are never visible in the public repo or the logs.
 4. On the iPhone, install **TestFlight** from the App Store, open the invite, and tap **Install**.
 5. The first time you launch the app:
    - Allow **Local Network**, **Camera** and **Motion & Fitness**.
-   - Accept the prompt to join the **PinkDrone** WiFi.
+   - Accept the prompt to join the **DroneBoyfriendTracker** WiFi.
 
 TestFlight builds expire after 90 days. To get a fresh one, run the workflow again.
 
@@ -62,11 +62,11 @@ TestFlight builds expire after 90 days. To get a fresh one, run the workflow aga
 
 - Open the failed run in the Actions tab; the red step has the error.
 - Once I have push access to the repo, I can read these logs myself and push fixes.
-- `No profiles for 'com.gabrielhcaribe.pinkdrone'` or `cloud signing` errors: check that the API key has **Admin** access and that the App ID from step 1 exists with **Hotspot** enabled.
+- `No profiles for 'com.gabrielhcaribe.droneboyfriendtracker'` or `cloud signing` errors: check that the API key has **Admin** access and that the App ID from step 1 exists with **Hotspot** enabled.
 - `No suitable application records were found`: step 2 is missing, or the bundle ID doesn't match.
 
 ## Fallback: a rented Mac
 A cloud Mac (e.g. MacinCloud, about $1–2/hour) running Xcode works too:
 1. `brew install xcodegen`, then `cd ios && cp Secrets.example.xcconfig Secrets.xcconfig` and edit it.
-2. Run `xcodegen generate` and open `PinkDrone.xcodeproj`.
+2. Run `xcodegen generate` and open `DroneBoyfriendTracker.xcodeproj`.
 3. Under Signing, pick your team, plug in the iPhone and press Run.

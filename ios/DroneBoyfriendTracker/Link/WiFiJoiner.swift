@@ -7,7 +7,7 @@ import NetworkExtension
 
 enum WiFiJoiner {
     static var ssid: String {
-        (Bundle.main.object(forInfoDictionaryKey: "DroneWiFiSSID") as? String) ?? "PinkDrone"
+        (Bundle.main.object(forInfoDictionaryKey: "DroneWiFiSSID") as? String) ?? "DroneBoyfriendTracker"
     }
 
     private static var password: String {

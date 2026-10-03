@@ -31,9 +31,9 @@
    - If it hangs at `Connecting.....___`, hold the board's **BOOT** button until it starts writing.
 7. Open **Tools → Serial Monitor** at **115200** baud and press the board's EN/RST button. You should see:
    ```
-   [boot] PinkDrone FC
+   [boot] DroneBoyfriendTracker FC
    [boot] MPU WHO_AM_I = 0x70 -> OK
-   [link] AP "PinkDrone" on channel 6, 192.168.4.1:4210
+   [link] AP "DroneBoyfriendTracker" on channel 6, 192.168.4.1:4210
    [boot] keep the drone still: calibrating gyro (LED blinks fast)
    ```
    - `0x71`, `0x73`, `0x74` or `0x75` are also fine (relabelled chips).

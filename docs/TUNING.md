@@ -89,7 +89,7 @@ Change **one thing at a time** in 10 % steps. Do roll and pitch together if the 
 | `gyro_lpf_hz` | Extra gyro filter (0 = off). Try 100–150 if motor noise is high. |
 
 ## Follow-mode (phone outer loop) gains
-These live in `ios/PinkDrone/Follow/FollowConfig.swift`. Change them and rebuild.
+These live in `ios/DroneBoyfriendTracker/Follow/FollowConfig.swift`. Change them and rebuild.
 
 | Gain | Effect |
 |---|---|

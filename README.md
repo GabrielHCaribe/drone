@@ -1,4 +1,4 @@
-# PinkDrone ♥
+# DroneBoyfriendTracker ♥
 
 A follow-me quadcopter built from:
 - an **ESP32** running the flight controller
@@ -24,7 +24,7 @@ docs/               Wiring, uploading, iOS build, protocol, testing order, tunin
 ## How the pieces fit
 
 ```
-             WiFi access point "PinkDrone" (hosted by the ESP32, 192.168.4.1, UDP 4210)
+             WiFi access point "DroneBoyfriendTracker" (hosted by the ESP32, 192.168.4.1, UDP 4210)
    ┌────────────────────────────┬───────────────────────────────┬──────────────────────────┐
    │ Laptop (ground station)    │ iPhone - Remote role          │ iPhone - Drone role      │
    │ heartbeat 50 Hz            │ (in your hand)                │ (mounted on the drone)   │

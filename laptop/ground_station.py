@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-PinkDrone ground station (Windows / macOS / Linux, Python 3.8+, standard library only)
+DroneBoyfriendTracker ground station (Windows / macOS / Linux, Python 3.8+, standard library only)
 
     python ground_station.py
 
@@ -31,7 +31,7 @@ import time
 import webbrowser
 
 # --------------------------------------------------------------------------- config
-DRONE_ADDR = (os.environ.get("PINKDRONE_IP", "192.168.4.1"), 4210)
+DRONE_ADDR = (os.environ.get("DRONEBOYFRIENDTRACKER_IP", "192.168.4.1"), 4210)
 LOCAL_CTRL_PORT = 4212   # replies (telemetry, acks) come back to this port
 VIDEO_PORT = 4211        # JPEG frames from the drone iPhone
 HTTP_PORT = 8765         # browser UI: http://127.0.0.1:8765
@@ -376,9 +376,9 @@ def main():
 
     server = Server(("127.0.0.1", HTTP_PORT), Handler)
     url = f"http://127.0.0.1:{HTTP_PORT}/"
-    print("PinkDrone ground station")
+    print("DroneBoyfriendTracker ground station")
     print(f"  UI:     {url}")
-    print(f"  Drone:  {DRONE_ADDR[0]}:{DRONE_ADDR[1]}  (join the 'PinkDrone' WiFi first)")
+    print(f"  Drone:  {DRONE_ADDR[0]}:{DRONE_ADDR[1]}  (join the 'DroneBoyfriendTracker' WiFi first)")
     print("  KILL:   Space or K in the browser page.  Ctrl+C here to quit.")
     print("  Keep the page open: closing it stops the heartbeat and the drone lands.")
     if "--no-browser" not in sys.argv:

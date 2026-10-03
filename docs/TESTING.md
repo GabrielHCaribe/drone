@@ -15,7 +15,7 @@ Kill is latched; reset it with **Disarm** / **Clear kill**.
 - **Pass:** `WHO_AM_I = 0x70 -> OK`, and the LED goes from fast blink (gyro calibration) to a short flash every second.
 
 ## 2. Laptop link and loop timing
-- Join PinkDrone WiFi, run `py laptop\ground_station.py`.
+- Join DroneBoyfriendTracker WiFi, run `py laptop\ground_station.py`.
 - **Pass:**
   - "drone connected" and "kill switch active"
   - state DISARMED

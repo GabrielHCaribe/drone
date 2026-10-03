@@ -12,8 +12,8 @@ import UIKit
 
 final class CameraPipeline: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     let session = AVCaptureSession()
-    private let sessionQueue = DispatchQueue(label: "pinkdrone.camera.session")
-    private let videoQueue = DispatchQueue(label: "pinkdrone.camera", qos: .userInteractive)
+    private let sessionQueue = DispatchQueue(label: "droneboyfriendtracker.camera.session")
+    private let videoQueue = DispatchQueue(label: "droneboyfriendtracker.camera", qos: .userInteractive)
     private let output = AVCaptureVideoDataOutput()
     private var device: AVCaptureDevice?
     private var rotationCoordinator: AVCaptureDevice.RotationCoordinator?
@@ -41,7 +41,7 @@ final class CameraPipeline: NSObject, AVCaptureVideoDataOutputSampleBufferDelega
         AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
             guard let self else { return }
             guard granted else {
-                DispatchQueue.main.async { self.onError?("Camera access denied. Enable it in Settings > PinkDrone.") }
+                DispatchQueue.main.async { self.onError?("Camera access denied. Enable it in Settings > DroneBoyfriendTracker.") }
                 return
             }
             self.sessionQueue.async {

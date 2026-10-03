@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct PinkDroneApp: App {
+struct DroneBoyfriendTrackerApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var model = AppModel()
 

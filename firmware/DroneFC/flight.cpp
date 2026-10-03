@@ -11,7 +11,7 @@
 //  These need deterministic sub-millisecond timing, and they must keep working
 //  when every phone and the laptop are gone. That is why they are here.
 //
-//  What runs on the PHONE (see ios/PinkDrone/Follow/FollowController.swift):
+//  What runs on the PHONE (see ios/DroneBoyfriendTracker/Follow/FollowController.swift):
 //    * person detection, distance / height estimation, the follow outer loops
 //      (distance -> pitch, sideways offset -> roll, height -> throttle).
 //    They need the camera, and they work at 1-2 Hz bandwidth, so 30 Hz updates

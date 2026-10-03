@@ -25,7 +25,7 @@ struct RolePickerView: View {
         VStack(spacing: 18) {
             HStack(spacing: 10) {
                 Image(systemName: "heart.fill").foregroundStyle(Theme.pink)
-                Text("PinkDrone").font(.system(size: 34, weight: .heavy, design: .rounded))
+                Text("DroneBoyfriendTracker").font(.system(size: 34, weight: .heavy, design: .rounded))
                     .foregroundStyle(Theme.dreamy)
                 Image(systemName: "sparkles").foregroundStyle(Theme.lilac)
             }

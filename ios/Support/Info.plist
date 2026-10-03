@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>PinkDrone</string>
+	<string>DroneBoyfriendTracker</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -29,7 +29,7 @@
 	<key>NSMotionUsageDescription</key>
 	<string>Motion sensors and the barometer estimate the drone's height and correct for camera tilt.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>PinkDrone talks to your drone over its own WiFi network (192.168.4.1).</string>
+	<string>DroneBoyfriendTracker talks to your drone over its own WiFi network (192.168.4.1).</string>
 	<key>DroneWiFiSSID</key>
 	<string>$(DRONE_WIFI_SSID)</string>
 	<key>DroneWiFiPassword</key>

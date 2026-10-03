@@ -44,7 +44,7 @@ final class FollowController {
     /// Sends CMD_LAND with the given reason (wired to the DroneLink by AppModel).
     var onLandRequest: ((LandReason) -> Void)?
 
-    private let queue = DispatchQueue(label: "pinkdrone.follow", qos: .userInteractive)
+    private let queue = DispatchQueue(label: "droneboyfriendtracker.follow", qos: .userInteractive)
     private let motionQueue = OperationQueue()
     private let motion = CMMotionManager()
     private let altimeter = CMAltimeter()

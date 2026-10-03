@@ -6,7 +6,7 @@
 2. Get the repo (Code → Download ZIP) and unzip it.
 
 ## Every session
-1. Power the drone. Join the **PinkDrone** WiFi on the laptop (same password as `secrets.h`).
+1. Power the drone. Join the **DroneBoyfriendTracker** WiFi on the laptop (same password as `secrets.h`).
    - Windows will say "No internet". That's expected.
    - The laptop has no internet over WiFi while connected.
 2. Open a terminal in the repo folder and run:

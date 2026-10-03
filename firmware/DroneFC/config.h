@@ -1,5 +1,5 @@
 // =============================================================================
-//  config.h  -  compile-time hardware configuration for the PinkDrone FC
+//  config.h  -  compile-time hardware configuration for the DroneBoyfriendTracker FC
 //
 //  Board : ESP32-WROOM-32 on a 38-pin DevKitC ("ESP32 Dev Module" in Arduino IDE)
 //  IMU   : MPU6500 breakout wired for SPI
@@ -74,7 +74,7 @@
 
 // ---------------------------------------------------------------- network
 // SSID is not secret; the password lives in secrets.h (git-ignored).
-#define WIFI_SSID "PinkDrone"
+#define WIFI_SSID "DroneBoyfriendTracker"
 #define WIFI_CHANNEL 6
 #define WIFI_MAX_CLIENTS 4
 #define UDP_PORT 4210

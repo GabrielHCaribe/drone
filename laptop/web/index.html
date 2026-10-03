@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PinkDrone Ground Station</title>
+<title>DroneBoyfriendTracker Ground Station</title>
 <style>
   :root {
     --bg: #1d0f1a;
@@ -63,7 +63,7 @@
 </head>
 <body>
   <div class="bar">
-    <h1>&#9829; PinkDrone</h1>
+    <h1>&#9829; DroneBoyfriendTracker</h1>
     <div class="pill"><span class="dot" id="linkDot"></span><span id="linkText">no drone</span></div>
     <div class="pill">State <b id="state">-</b></div>
     <div class="pill" id="armedPill"><b id="armed">DISARMED</b></div>
@@ -212,7 +212,7 @@ async function poll() {
   $("hbDot").className = "dot " + (s.browser_alive ? "ok" : "bad");
   $("hbText").textContent = s.browser_alive ? "kill switch active" : "heartbeat stopped!";
   $("linkDot").className = "dot " + (fresh ? "ok" : (t ? "warn" : "bad"));
-  $("linkText").textContent = fresh ? "drone connected" : (t ? "drone link lost" : "no drone (join PinkDrone WiFi)");
+  $("linkText").textContent = fresh ? "drone connected" : (t ? "drone link lost" : "no drone (join DroneBoyfriendTracker WiFi)");
   $("clearKill").style.display = s.kill_latched || (t && t.state === 9) ? "block" : "none";
   if (!s.kill_latched) $("kill").classList.remove("latched");
 

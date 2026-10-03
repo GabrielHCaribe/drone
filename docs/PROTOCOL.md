@@ -3,7 +3,7 @@
 - **Transport:** UDP to `192.168.4.1:4210`. The ESP32 replies to the address and port each packet came from.
 - **No broadcast or multicast:** so no multicast entitlement is needed on iOS.
 - **Byte order:** little-endian.
-- **Sources of truth:** `firmware/DroneFC/protocol.h`, `ios/PinkDrone/Link/Protocol.swift` and `laptop/ground_station.py`.
+- **Sources of truth:** `firmware/DroneFC/protocol.h`, `ios/DroneBoyfriendTracker/Link/Protocol.swift` and `laptop/ground_station.py`.
 
 ```
 [Header 8][payload N][CRC16 2]
