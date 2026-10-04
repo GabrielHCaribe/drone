@@ -23,6 +23,7 @@ struct RemoteView: View {
                     Button("Switch to Drone role") { model.activate(.drone) }
                     Button("Re-join drone WiFi") { model.joinWiFi() }
                     Button("Choose role…") { model.leaveRole() }
+                    Button("Switch look") { model.toggleLook() }.disabled(!model.canSwitchLook)
                 } label: {
                     Image(systemName: "ellipsis.circle.fill").font(.system(size: 24)).foregroundStyle(Theme.softPink)
                 }
@@ -32,7 +33,7 @@ struct RemoteView: View {
             HStack(alignment: .center, spacing: 14) {
                 VStack(spacing: 4) {
                     StickView(kind: .throttleYaw) { x, y in model.sticks.setLeft(yaw: x, throttle: y) }
-                    Text("Throttle · Yaw").font(.system(size: 11, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
+                    Text("Throttle · Yaw").font(.system(size: 11, weight: .semibold, design: Theme.fontDesign)).foregroundStyle(Theme.muted)
                 }
 
                 VStack(spacing: 10) {
@@ -44,10 +45,10 @@ struct RemoteView: View {
 
                     if let t, !armed, t.state == .disarmed, t.armBlockManual != .ok {
                         Text("Arm: \(t.armBlockManual.label)")
-                            .font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.warn)
+                            .font(.system(size: 12, weight: .semibold, design: Theme.fontDesign)).foregroundStyle(Theme.warn)
                     } else if let t {
                         Text(t.state == .manual ? "Manual · thr \(Int(t.throttle * 100))%" : (t.lastEvent == .noEvent ? t.state.label : "\(t.state.label) · \(t.lastEvent.label)"))
-                            .font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.softPink)
+                            .font(.system(size: 12, weight: .semibold, design: Theme.fontDesign)).foregroundStyle(Theme.softPink)
                     }
 
                     HStack(spacing: 10) {
@@ -72,7 +73,7 @@ struct RemoteView: View {
 
                 VStack(spacing: 4) {
                     StickView(kind: .pitchRoll) { x, y in model.sticks.setRight(roll: x, pitch: y) }
-                    Text("Pitch · Roll").font(.system(size: 11, weight: .semibold, design: .rounded)).foregroundStyle(Theme.muted)
+                    Text("Pitch · Roll").font(.system(size: 11, weight: .semibold, design: Theme.fontDesign)).foregroundStyle(Theme.muted)
                 }
             }
             .frame(maxHeight: .infinity)

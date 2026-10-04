@@ -45,7 +45,7 @@ struct DroneView: View {
                     } label: {
                         VStack(spacing: 2) {
                             Image(systemName: "figure.walk.motion").font(.system(size: 26, weight: .bold))
-                            Text("Follow").font(.system(size: 17, weight: .heavy, design: .rounded))
+                            Text("Follow").font(.system(size: 17, weight: .heavy, design: Theme.fontDesign))
                         }
                     }
                     .buttonStyle(CandyButtonStyle())
@@ -56,7 +56,7 @@ struct DroneView: View {
                 Button("Manual") {}
                     .buttonStyle(CandyButtonStyle(tint: .secondaryCandy, compact: true))
                     .disabled(true)
-                    .overlay(Text("Remote role").font(.system(size: 9, design: .rounded)).foregroundStyle(Theme.muted).offset(y: 22))
+                    .overlay(Text("Remote role").font(.system(size: 9, design: Theme.fontDesign)).foregroundStyle(Theme.muted).offset(y: 22))
                 Spacer()
                 readiness
                 Menu {
@@ -68,6 +68,7 @@ struct DroneView: View {
                     Button("Switch to Remote role") { model.activate(.remote) }
                     Button("Re-join drone WiFi") { model.joinWiFi() }
                     Button("Choose role…") { model.leaveRole() }
+                    Button("Switch look") { model.toggleLook() }.disabled(!model.canSwitchLook)
                 } label: {
                     Label("More", systemImage: "ellipsis.circle.fill")
                 }
@@ -80,15 +81,15 @@ struct DroneView: View {
                 CameraView(pipeline: camera, mirrored: follow.front)
                     .aspectRatio(4.0 / 3.0, contentMode: .fit)
                     .overlay(boxesOverlay)
-                    .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
-                    .overlay(RoundedRectangle(cornerRadius: 26, style: .continuous).stroke(Theme.dreamy, lineWidth: 3))
-                    .shadow(color: Theme.pink.opacity(0.45), radius: 14)
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.basic ? 0 : 26, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: Theme.basic ? 0 : 26, style: .continuous).stroke(Theme.dreamy, lineWidth: Theme.basic ? 0 : 3))
+                    .glow(color: Theme.pink.opacity(0.45), radius: 14)
 
                 VStack {
                     TelemetryBar(link: link, height: status.height)
                     WiFiBanner()
                     if let msg = model.cameraError ?? calibMessage {
-                        Text(msg).font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.warn)
+                        Text(msg).font(.system(size: 12, weight: .semibold, design: Theme.fontDesign)).foregroundStyle(Theme.warn)
                             .padding(6).background(Capsule().fill(Theme.panel.opacity(0.9)))
                     }
                     Spacer()
@@ -99,9 +100,9 @@ struct DroneView: View {
 
                 if state == .followCountdown, let t {
                     Text("\(max(1, Int(ceil(t.countdown))))")
-                        .font(.system(size: 150, weight: .black, design: .rounded))
+                        .font(.system(size: 150, weight: .black, design: Theme.fontDesign))
                         .foregroundStyle(Theme.dreamy)
-                        .shadow(color: Theme.pink, radius: 24)
+                        .glow(color: Theme.pink, radius: 24)
                         .transition(.scale)
                 }
             }
@@ -127,7 +128,7 @@ struct DroneView: View {
             row(status.barometerAvailable, "Barometer")
             row(link.telemetry?.laptopConnected ?? false, "Laptop")
         }
-        .font(.system(size: 11, weight: .semibold, design: .rounded))
+        .font(.system(size: 11, weight: .semibold, design: Theme.fontDesign))
         .foregroundStyle(Theme.text)
     }
 
@@ -145,7 +146,7 @@ struct DroneView: View {
             if phase == .idle, let vh = status.visionHeight { Text(String(format: "cam %.1f m up", vh)) }
             if let e = t?.lastEvent, e != .noEvent, phase == .idle { Text("· \(e.label)").foregroundStyle(Theme.muted) }
         }
-        .font(.system(size: 13, weight: .semibold, design: .rounded))
+        .font(.system(size: 13, weight: .semibold, design: Theme.fontDesign))
         .foregroundStyle(Theme.text)
         .padding(.horizontal, 12).padding(.vertical, 6)
         .background(Capsule().fill(Theme.panel.opacity(0.85)))
@@ -161,11 +162,13 @@ struct DroneView: View {
                 }
                 if let r = status.targetBox {
                     box(r, in: g.size, mirror: mirror)
-                        .stroke(Theme.pink, lineWidth: 4)
-                        .shadow(color: Theme.pink, radius: 8)
-                    Image(systemName: "heart.fill")
-                        .foregroundStyle(Theme.pink)
-                        .position(x: (mirror ? 1 - r.midX : r.midX) * g.size.width, y: max(10, r.minY * g.size.height - 12))
+                        .stroke(Theme.basic ? Theme.ok : Theme.pink, lineWidth: Theme.basic ? 2 : 4)
+                        .glow(color: Theme.pink, radius: 8)
+                    if !Theme.basic {
+                        Image(systemName: "heart.fill")
+                            .foregroundStyle(Theme.pink)
+                            .position(x: (mirror ? 1 - r.midX : r.midX) * g.size.width, y: max(10, r.minY * g.size.height - 12))
+                    }
                 }
             }
         }
@@ -175,6 +178,6 @@ struct DroneView: View {
     private func box(_ r: CGRect, in size: CGSize, mirror: Bool) -> Path {
         let x = mirror ? 1 - r.maxX : r.minX
         return Path(roundedRect: CGRect(x: x * size.width, y: r.minY * size.height, width: r.width * size.width, height: r.height * size.height),
-                    cornerRadius: 14)
+                    cornerRadius: Theme.basic ? 0 : 14)
     }
 }

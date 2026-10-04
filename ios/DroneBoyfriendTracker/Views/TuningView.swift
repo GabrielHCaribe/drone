@@ -106,7 +106,7 @@ struct TuningView: View {
         HStack(spacing: 6) {
             VStack(alignment: .leading, spacing: 1) {
                 Text(p.name).font(.system(size: 13, weight: .semibold, design: .monospaced)).foregroundStyle(Theme.text)
-                Text(fmt(p.value)).font(.system(size: 15, weight: .bold, design: .rounded)).foregroundStyle(Theme.softPink)
+                Text(fmt(p.value)).font(.system(size: 15, weight: .bold, design: Theme.fontDesign)).foregroundStyle(Theme.softPink)
                     .onTapGesture { editText = fmt(p.value); editing = p }
             }
             Spacer()
@@ -127,7 +127,7 @@ struct TuningView: View {
             link.setParam(id: p.id, value: min(p.max, max(p.min, v)))
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
         }
-        .font(.system(size: 12, weight: .bold, design: .rounded))
+        .font(.system(size: 12, weight: .bold, design: Theme.fontDesign))
         .foregroundStyle(Theme.text)
         .padding(.horizontal, 8).padding(.vertical, 6)
         .background(Capsule().fill(Theme.candy.opacity(0.8)))

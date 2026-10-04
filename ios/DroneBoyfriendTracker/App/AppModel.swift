@@ -16,6 +16,8 @@ final class AppModel: ObservableObject {
     @Published private(set) var role: AppRole?
     @Published var wifiMessage: String?
     @Published var cameraError: String?
+    /// Plain "first iteration" look instead of the pink theme (see Theme.swift).
+    @Published private(set) var basicLook = Theme.basic
 
     let link = DroneLink()
     let sticks = StickInput()
@@ -73,6 +75,19 @@ final class AppModel: ObservableObject {
         follow = nil
         UserDefaults.standard.removeObject(forKey: "role")
         role = nil
+    }
+
+    /// Swapping looks rebuilds every view (stick knobs snap to centre), so it is
+    /// refused while armed and the stick input is zeroed to match.
+    var canSwitchLook: Bool { !(link.telemetry?.armed ?? false) }
+
+    func toggleLook() {
+        guard canSwitchLook else { return }
+        sticks.setLeft(yaw: 0, throttle: 0)
+        sticks.setRight(roll: 0, pitch: 0)
+        Theme.basic.toggle()
+        UserDefaults.standard.set(Theme.basic, forKey: "basicLook")
+        basicLook = Theme.basic
     }
 
     func joinWiFi() {

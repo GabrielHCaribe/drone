@@ -9,17 +9,22 @@ struct KillButton: View {
     var body: some View {
         let latched = link.killLatched
         ZStack {
-            Circle()
-                .fill(RadialGradient(colors: [Color(red: 1, green: 0.45, blue: 0.56), Color(red: 0.83, green: 0.06, blue: 0.27)],
-                                     center: .init(x: 0.5, y: 0.3), startRadius: 2, endRadius: size * 0.7))
-                .overlay(Circle().stroke(.white.opacity(0.7), lineWidth: 4).padding(5))
-                .overlay(Circle().stroke(Theme.danger, lineWidth: 3))
-                .shadow(color: Theme.danger.opacity(latched ? 1 : 0.7), radius: latched ? 28 : 16)
-            VStack(spacing: 2) {
-                Image(systemName: "xmark.octagon.fill").font(.system(size: size * 0.22, weight: .black))
-                Text("KILL").font(.system(size: size * 0.2, weight: .black, design: .rounded))
+            if Theme.basic {
+                Circle().fill(latched ? Color(red: 0.6, green: 0, blue: 0) : .red)
+                Text("STOP").font(.system(size: size * 0.2, weight: .bold)).foregroundStyle(.white)
+            } else {
+                Circle()
+                    .fill(RadialGradient(colors: [Color(red: 1, green: 0.45, blue: 0.56), Color(red: 0.83, green: 0.06, blue: 0.27)],
+                                         center: .init(x: 0.5, y: 0.3), startRadius: 2, endRadius: size * 0.7))
+                    .overlay(Circle().stroke(.white.opacity(0.7), lineWidth: 4).padding(5))
+                    .overlay(Circle().stroke(Theme.danger, lineWidth: 3))
+                    .glow(color: Theme.danger.opacity(latched ? 1 : 0.7), radius: latched ? 28 : 16)
+                VStack(spacing: 2) {
+                    Image(systemName: "xmark.octagon.fill").font(.system(size: size * 0.22, weight: .black))
+                    Text("KILL").font(.system(size: size * 0.2, weight: .black, design: Theme.fontDesign))
+                }
+                .foregroundStyle(.white)
             }
-            .foregroundStyle(.white)
         }
         .frame(width: size, height: size)
         .scaleEffect(fired ? 0.92 : 1)
@@ -48,7 +53,7 @@ struct HoldButton: View {
 
     var body: some View {
         Text(title)
-            .font(.system(size: 15, weight: .bold, design: .rounded))
+            .font(.system(size: 15, weight: .bold, design: Theme.fontDesign))
             .foregroundStyle(Theme.text)
             .padding(.vertical, 11)
             .frame(maxWidth: .infinity)
@@ -62,7 +67,7 @@ struct HoldButton: View {
                 .clipShape(Capsule())
                 .overlay(Capsule().stroke(.white.opacity(0.3), lineWidth: 1))
             )
-            .shadow(color: Theme.pink.opacity(0.4), radius: 8)
+            .glow(color: Theme.pink.opacity(0.4), radius: 8)
             .onLongPressGesture(minimumDuration: seconds, perform: {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 action()
@@ -77,7 +82,7 @@ struct HoldButton: View {
 struct StatusDot: View {
     let color: Color
     var body: some View {
-        Circle().fill(color).frame(width: 9, height: 9).shadow(color: color, radius: 4)
+        Circle().fill(color).frame(width: 9, height: 9).glow(color: color, radius: 4)
     }
 }
 
@@ -119,7 +124,7 @@ struct TelemetryBar: View {
             }
             Spacer(minLength: 0)
         }
-        .font(.system(size: 12, weight: .semibold, design: .rounded))
+        .font(.system(size: 12, weight: .semibold, design: Theme.fontDesign))
         .foregroundStyle(Theme.text)
     }
 
@@ -136,7 +141,13 @@ struct TelemetryBar: View {
         HStack(spacing: 5) { content() }
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
-            .background(Capsule().fill(Theme.panel.opacity(0.85)).overlay(Capsule().stroke(Theme.pink.opacity(0.3), lineWidth: 1)))
+            .background {
+                if Theme.basic {
+                    RoundedRectangle(cornerRadius: 4).fill(Theme.panel.opacity(0.85))
+                } else {
+                    Capsule().fill(Theme.panel.opacity(0.85)).overlay(Capsule().stroke(Theme.pink.opacity(0.3), lineWidth: 1))
+                }
+            }
     }
 }
 
@@ -149,11 +160,11 @@ struct AckToast: View {
         Group {
             if visible, let ack = link.lastAck, let cmd = ack.command {
                 Text(ack.result == .ok ? "\(cmd.label) ✓" : "\(cmd.label): \(ack.result.label)")
-                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .font(.system(size: 13, weight: .bold, design: Theme.fontDesign))
                     .foregroundStyle(ack.result == .ok ? Theme.ok : Theme.warn)
                     .padding(.horizontal, 14).padding(.vertical, 7)
                     .background(Capsule().fill(Theme.panel.opacity(0.95)))
-                    .shadow(color: Theme.pink.opacity(0.4), radius: 8)
+                    .glow(color: Theme.pink.opacity(0.4), radius: 8)
                     .transition(.opacity.combined(with: .scale))
             }
         }
@@ -173,7 +184,7 @@ struct WiFiBanner: View {
                 Text(msg).lineLimit(2)
                 Button("Retry") { model.joinWiFi() }.buttonStyle(CandyButtonStyle(compact: true)).frame(width: 80)
             }
-            .font(.system(size: 12, weight: .semibold, design: .rounded))
+            .font(.system(size: 12, weight: .semibold, design: Theme.fontDesign))
             .foregroundStyle(Theme.warn)
             .padding(8)
             .background(RoundedRectangle(cornerRadius: 14).fill(Theme.panel.opacity(0.95)))

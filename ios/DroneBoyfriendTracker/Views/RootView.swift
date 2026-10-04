@@ -15,6 +15,7 @@ struct RootView: View {
             case nil: RolePickerView()
             }
         }
+        .id(model.basicLook)  // the theme is static, so rebuild everything when the look changes
     }
 }
 
@@ -24,13 +25,15 @@ struct RolePickerView: View {
     var body: some View {
         VStack(spacing: 18) {
             HStack(spacing: 10) {
-                Image(systemName: "heart.fill").foregroundStyle(Theme.pink)
-                Text("DroneBoyfriendTracker").font(.system(size: 34, weight: .heavy, design: .rounded))
+                if !Theme.basic { Image(systemName: "heart.fill").foregroundStyle(Theme.pink) }
+                Text("DroneBoyfriendTracker")
+                    .font(Theme.basic ? Font.system(size: 28, weight: .semibold) : Font.system(size: 34, weight: .heavy, design: Theme.fontDesign))
                     .foregroundStyle(Theme.dreamy)
-                Image(systemName: "sparkles").foregroundStyle(Theme.lilac)
+                if !Theme.basic { Image(systemName: "sparkles").foregroundStyle(Theme.lilac) }
             }
-            Text("How is this iPhone being used?")
-                .font(.system(size: 15, weight: .medium, design: .rounded))
+            .onLongPressGesture(minimumDuration: 2) { model.toggleLook() }  // hidden look switch
+            Text(Theme.basic ? "Select mode:" : "How is this iPhone being used?")
+                .font(.system(size: 15, weight: .medium, design: Theme.fontDesign))
                 .foregroundStyle(Theme.muted)
             HStack(spacing: 20) {
                 roleCard(icon: "gamecontroller.fill", title: "Remote", subtitle: "In your hands.\nSticks, manual flight,\ntuning, motor test.") {
@@ -44,20 +47,33 @@ struct RolePickerView: View {
         .padding()
     }
 
+    @ViewBuilder
     private func roleCard(icon: String, title: String, subtitle: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            VStack(spacing: 10) {
-                Image(systemName: icon).font(.system(size: 38, weight: .bold)).foregroundStyle(Theme.pink)
-                Text(title).font(.system(size: 22, weight: .heavy, design: .rounded)).foregroundStyle(Theme.text)
-                Text(subtitle).font(.system(size: 13, design: .rounded)).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
+        if Theme.basic {
+            Button(action: action) {
+                VStack(spacing: 6) {
+                    Text(title).font(.system(size: 20, weight: .semibold))
+                    Text(subtitle).font(.system(size: 12)).foregroundStyle(.gray).multilineTextAlignment(.center)
+                }
+                .frame(width: 200, height: 120)
+                .background(RoundedRectangle(cornerRadius: 8).fill(Theme.panel))
             }
-            .frame(width: 220, height: 200)
-            .background(
-                RoundedRectangle(cornerRadius: 30, style: .continuous).fill(Theme.panel)
-                    .overlay(RoundedRectangle(cornerRadius: 30, style: .continuous).stroke(Theme.dreamy, lineWidth: 2))
-            )
-            .shadow(color: Theme.pink.opacity(0.4), radius: 16)
+            .buttonStyle(.plain)
+        } else {
+            Button(action: action) {
+                VStack(spacing: 10) {
+                    Image(systemName: icon).font(.system(size: 38, weight: .bold)).foregroundStyle(Theme.pink)
+                    Text(title).font(.system(size: 22, weight: .heavy, design: Theme.fontDesign)).foregroundStyle(Theme.text)
+                    Text(subtitle).font(.system(size: 13, design: Theme.fontDesign)).foregroundStyle(Theme.muted).multilineTextAlignment(.center)
+                }
+                .frame(width: 220, height: 200)
+                .background(
+                    RoundedRectangle(cornerRadius: 30, style: .continuous).fill(Theme.panel)
+                        .overlay(RoundedRectangle(cornerRadius: 30, style: .continuous).stroke(Theme.dreamy, lineWidth: 2))
+                )
+                .glow(color: Theme.pink.opacity(0.4), radius: 16)
+            }
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
     }
 }

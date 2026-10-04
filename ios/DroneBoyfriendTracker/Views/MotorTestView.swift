@@ -23,7 +23,7 @@ struct MotorTestView: View {
                         GlassCard {
                             Toggle(isOn: $propsOff) {
                                 Label("All four propellers are REMOVED", systemImage: "exclamationmark.triangle.fill")
-                                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                                    .font(.system(size: 15, weight: .bold, design: Theme.fontDesign))
                                     .foregroundStyle(propsOff ? Theme.ok : Theme.warn)
                             }
                             .tint(Theme.pink)
@@ -35,7 +35,7 @@ struct MotorTestView: View {
                                 ForEach(0..<4, id: \.self) { i in
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text("\(names[i])  \(Int(values[i] * 100))%")
-                                            .font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Theme.text)
+                                            .font(.system(size: 12, weight: .semibold, design: Theme.fontDesign)).foregroundStyle(Theme.text)
                                         Slider(value: Binding(get: { values[i] }, set: { values[i] = $0; push() }), in: 0...0.15)
                                     }
                                 }
@@ -53,9 +53,9 @@ struct MotorTestView: View {
                         GlassCard {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("ESC calibration (props OFF, see docs/TESTING.md)")
-                                    .font(.system(size: 14, weight: .bold, design: .rounded)).foregroundStyle(Theme.softPink)
+                                    .font(.system(size: 14, weight: .bold, design: Theme.fontDesign)).foregroundStyle(Theme.softPink)
                                 Text("1. Flight battery UNPLUGGED, ESP32 on USB, phone connected.\n2. Press \"Max signal\".\n3. Plug in the flight battery, wait for the ESC beeps.\n4. Press \"Min signal\", wait for the confirmation beeps.\n5. Press \"Finish\".")
-                                    .font(.system(size: 12, design: .rounded)).foregroundStyle(Theme.text)
+                                    .font(.system(size: 12, design: Theme.fontDesign)).foregroundStyle(Theme.text)
                                 HStack {
                                     Button("Max signal") { confirmEsc = true }
                                         .buttonStyle(CandyButtonStyle(tint: escStep == 1 ? Theme.candy : .secondaryCandy, compact: true))
@@ -108,19 +108,19 @@ struct MotorTestView: View {
                     p.move(to: CGPoint(x: 0.8 * s, y: 0.2 * s)); p.addLine(to: CGPoint(x: 0.2 * s, y: 0.8 * s))
                 }
                 .stroke(Theme.softPink.opacity(0.6), lineWidth: 5)
-                Text("FRONT").font(.system(size: 10, weight: .bold, design: .rounded)).foregroundStyle(Theme.muted).position(x: s / 2, y: 8)
+                Text("FRONT").font(.system(size: 10, weight: .bold, design: Theme.fontDesign)).foregroundStyle(Theme.muted).position(x: s / 2, y: 8)
                 ForEach(0..<4, id: \.self) { i in
                     ZStack {
                         Circle().fill(Theme.dreamy.opacity(0.3 + values[i] * 4))
                         Circle().stroke(Theme.pink, lineWidth: 2)
                         VStack(spacing: 0) {
-                            Text("M\(i + 1)").font(.system(size: 13, weight: .heavy, design: .rounded))
+                            Text("M\(i + 1)").font(.system(size: 13, weight: .heavy, design: Theme.fontDesign))
                             Image(systemName: cw[i] ? "arrow.clockwise" : "arrow.counterclockwise").font(.system(size: 11, weight: .bold))
                         }
                         .foregroundStyle(Theme.text)
                     }
                     .frame(width: s * 0.3, height: s * 0.3)
-                    .shadow(color: Theme.pink.opacity(values[i] > 0 ? 0.9 : 0.2), radius: 10)
+                    .glow(color: Theme.pink.opacity(values[i] > 0 ? 0.9 : 0.2), radius: 10)
                     .position(x: pos[i].x * s, y: pos[i].y * s)
                 }
             }
